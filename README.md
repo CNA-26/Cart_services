@@ -1,24 +1,62 @@
-# docker-fastapi 
+# Cart Service 🛒
 
-A sample project for deploying to a PaaS Service like Render or CSC Rahti.
+Detta är en Microservice som hanterar varukorgen för butiken
+Just nu körs den med mock data för att möjliggöra frontend-utveckling utan databas.
 
-### For deployment to Render
+För tillfället endast **GET** endpoints
 
-- Log in to https://render.com/
-- Create a New Web Service.
-- Connect to GitHub and choose Connect Credentials.
-- Set Language to Docker.
-- Select the EU Central region (or whatever is nearest to you)
-- Choose Instance Type: Free.
+---
 
-### For deployment to CSC Rahti (OpenShift)
+## Kom igång
 
-Note: Change the Git reference setting in OpenShift to *main*:    
-    Edit BuildConfig ==> Show advanced git options ==> Git reference: `main`
+Skapa och aktivera virtuell miljö:
 
-### For local real-time development
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # (Mac/Linux)
+.venv\Scripts\activate  # (Windows)
 
-Rename `.env-example` to `.env` to override the `MODE=production`set in the `Dockerfile`. Note that this needs a valueless declaration of `MODE` in `docker-compose.yml`
+```
 
-To run the container locally:
-`docker-compose up --build`
+installera requirements:
+
+```bash
+pip install -r requirements.txt
+```
+
+starta servern lokalt:
+
+```bash
+uvicorn main:app --reload
+```
+
+---
+
+### Api dokumentation
+
+FastAPI kommer mer automatisk swagger dokumentation, man kan testa endpoints när servern snurrar:
+http://127.0.0.1:8000/docs
+
+#### Exempel
+
+om man kör en GET på /cart/user_123 får man detta:
+
+```json
+{
+  "user_123": {
+    "user_id": "user_123",
+    "items": [
+      {
+        "product_id": 101,
+        "name": "Monstera",
+        "price": 30.0,
+        "quantity": 1,
+        "image_url": "https://example.com/monstera.jpg"
+      }
+    ],
+    "total_price": 30.0
+  }
+}
+```
+
+**OBS** datan är hårdkodad placeholder, men exempelvis kunde man kunna använda sig av detta format
