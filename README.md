@@ -3,7 +3,11 @@
 Detta är en Microservice som hanterar varukorgen för butiken
 Just nu körs den med mock data för att möjliggöra frontend-utveckling utan databas.
 
-För tillfället endast **GET** endpoints
+**Endpoints:**
+
+- **GET** `/cart/{user_id}` - Hämta cart
+- **POST** `/cart/{user_id}/add-item` - Lägg till item
+- **DELETE** `/cart/{user_id}/item/{product_id}` - Ta bort item
 
 ---
 

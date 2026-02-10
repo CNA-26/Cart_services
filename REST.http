@@ -1,0 +1,2 @@
+### Get status
+GET http://localhost:8000/status
