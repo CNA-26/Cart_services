@@ -37,11 +37,11 @@ mock_db = {
         "user_id": "user_123",
         "items": [
             {
-                "product_id": 101, 
-                "name": "Monstera", 
-                "price": 30.00, 
+                "Id": 101, 
+                "ProductName": "Monstera", 
+                "Price": 30.00, 
                 "quantity": 1,
-                "image_url": "https://example.com/monstera.jpg" 
+                "Img": "https://example.com/monstera.jpg" 
             }
         ],
         "total_price": 30.00
