@@ -3,6 +3,8 @@
 Detta är en Microservice som hanterar varukorgen för butiken
 Just nu körs den med mock data för att möjliggöra frontend-utveckling utan databas.
 
+API URL: https://cart-services-git-cartservices.2.rahtiapp.fi
+
 **Endpoints:**
 
 - **GET** `/cart/{user_id}` - Hämta cart
