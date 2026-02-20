@@ -1,2 +1,74 @@
-### Get status
+### Check service status
 GET http://localhost:8000/status
+
+###
+
+### Check root endpoint
+GET http://localhost:8000/
+
+###
+
+### Get empty cart för user
+GET http://localhost:8000/cart/user_123
+
+###
+
+### Add item till cart
+POST http://localhost:8000/cart/user_123/add-item
+Content-Type: application/json
+
+{
+    "product_id": 101,
+    "name": "Monstera Plant",
+    "price": 29.99,
+    "quantity": 1,
+    "image_url": "https://example.com/monstera.jpg"
+}
+
+
+### Add second item till cart
+POST http://localhost:8000/cart/user_123/add-item
+Content-Type: application/json
+
+{
+    "product_id": 102,
+    "name": "Snake Plant",
+    "price": 19.99,
+    "quantity": 2,
+    "image_url": "https://example.com/snake-plant.jpg"
+}
+
+
+
+### Get cart 
+GET http://localhost:8000/cart/user_123
+
+
+###
+
+### Remove item från cart
+DELETE http://localhost:8000/cart/user_123/item/102
+
+###
+
+### Get cart 
+GET http://localhost:8000/cart/user_123
+
+###
+
+### Testa cart för annan user
+GET http://localhost:8000/cart/user_456
+
+###
+
+### Add item till cart för annan user
+POST http://localhost:8000/cart/user_456/add-item
+Content-Type: application/json
+
+{
+    "product_id": 201,
+    "name": "Fiddle Leaf Fig",
+    "price": 45.00,
+    "quantity": 1,
+    "image_url": "https://example.com/fiddle-leaf.jpg"
+}

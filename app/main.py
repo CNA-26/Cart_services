@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from . import database
 
 app = FastAPI()
 
@@ -31,22 +32,10 @@ class AddItemRequest(BaseModel):
     quantity: int = 1
     image_url: str
 
-# Mock data, placeholder for database
-mock_db = {
-    "user_123": {
-        "user_id": "user_123",
-        "items": [
-            {
-                "Id": 101, 
-                "ProductName": "Monstera", 
-                "Price": 30.00, 
-                "quantity": 1,
-                "Img": "https://example.com/monstera.jpg" 
-            }
-        ],
-        "total_price": 30.00
-    }
-}
+# Initialize database on startup
+@app.on_event("startup")
+async def startup_event():
+    database.init_database()
 
 @app.get("/")
 def read_root():
@@ -54,61 +43,29 @@ def read_root():
 
 
 @app.get("/cart/{user_id}", response_model=Cart)
-def get_cart(user_id: str):
-    if user_id in mock_db:
-        return mock_db[user_id]
-    
-    return {
-        "user_id": user_id,
-        "items": [],
-        "total_price": 0.0
-    }
+def get_cart_endpoint(user_id: str):
+    cart = database.get_cart(user_id)
+    if cart is None:
+        raise HTTPException(status_code=500, detail="Database connection error")
+    return cart
 
 
 @app.post("/cart/{user_id}/add-item")
-def add_item_to_cart(user_id: str, item: AddItemRequest):
-    
-    # Skapa tom cart om den inte finns
-    if user_id not in mock_db:
-        mock_db[user_id] = {"user_id": user_id, "items": [], "total_price": 0.0}
-    
-    cart = mock_db[user_id]
-    
-    # Hitta item eller lägg till nytt
-    for cart_item in cart["items"]:
-        if cart_item["product_id"] == item.product_id:
-            cart_item["quantity"] += item.quantity
-            break
-    else:
-        
-        cart["items"].append(item.dict())
-    
-    # Räkna om total
-    cart["total_price"] = sum(i["price"] * i["quantity"] for i in cart["items"])
-    
+def add_item_to_cart_endpoint(user_id: str, item: AddItemRequest):
+    cart = database.add_item_to_cart(user_id, item.dict())
+    if cart is None:
+        raise HTTPException(status_code=500, detail="Database connection error")
     return cart
 
 
 @app.delete("/cart/{user_id}/item/{product_id}")
-def remove_item_from_cart(user_id: str, product_id: int):
-    
-    if user_id not in mock_db:
-        return {"error": "Cart not found"}
-    
-    cart = mock_db[user_id]
-    
-    # Hitta och ta bort item
-    for i, cart_item in enumerate(cart["items"]):
-        if cart_item["product_id"] == product_id:
-            removed_item = cart["items"].pop(i)
-            break
-    else:
-        return {"error": "Item not found in cart"}
-    
-    # Räkna om total
-    cart["total_price"] = sum(i["price"] * i["quantity"] for i in cart["items"])
-    
-    return {"message": "Item removed", "removed_item": removed_item, "cart": cart}
+def remove_item_from_cart_endpoint(user_id: str, product_id: int):
+    result = database.remove_item_from_cart(user_id, product_id)
+    if result is None:
+        raise HTTPException(status_code=500, detail="Database connection error")
+    if "error" in result:
+        raise HTTPException(status_code=404, detail=result["error"])
+    return result
 
 
 @app.get("/status")
