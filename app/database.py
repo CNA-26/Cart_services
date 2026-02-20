@@ -1,6 +1,7 @@
 import psycopg2  # type: ignore
 from psycopg2.extras import RealDictCursor  # type: ignore
 import os
+import urllib.parse
 from dotenv import load_dotenv
 
 
@@ -9,13 +10,33 @@ load_dotenv()
  
 # För lokal development, använder .env fil
 # För deployment, använder OpenShift environment variables
-DB_CONFIG = {
-    'host': os.getenv('DB_HOST') or os.getenv('POSTGRESQL_SERVICE_HOST'),
-    'port': int(os.getenv('DB_PORT') or os.getenv('POSTGRESQL_SERVICE_PORT') or '5432'),
-    'database': os.getenv('DB_NAME') or os.getenv('POSTGRESQL_DATABASE') or os.getenv('DATABASE_NAME'),
-    'user': os.getenv('DB_USER') or os.getenv('POSTGRESQL_USER') or os.getenv('DATABASE_USER'), 
-    'password': os.getenv('DB_PASSWORD') or os.getenv('POSTGRESQL_PASSWORD') or os.getenv('DATABASE_PASSWORD')
-}
+# Stöder både DATABASE_URL och individuella variabler
+
+def get_db_config():
+    """Get database configuration from environment variables or DATABASE_URL"""
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # Parse DATABASE_URL
+        parsed = urllib.parse.urlparse(database_url)
+        return {
+            'host': parsed.hostname,
+            'port': parsed.port or 5432,
+            'database': parsed.path.lstrip('/'),
+            'user': parsed.username,
+            'password': parsed.password
+        }
+    else:
+        # Fallback till individuella miljövariabler
+        return {
+            'host': os.getenv('DB_HOST') or os.getenv('POSTGRESQL_SERVICE_HOST') or 'postgresql',
+            'port': int(os.getenv('DB_PORT') or os.getenv('POSTGRESQL_SERVICE_PORT') or '5432'),
+            'database': os.getenv('DB_NAME') or os.getenv('POSTGRESQL_DATABASE') or os.getenv('DATABASE_NAME') or 'sampledb',
+            'user': os.getenv('DB_USER') or os.getenv('POSTGRESQL_USER') or os.getenv('DATABASE_USER') or 'userVNQ', 
+            'password': os.getenv('DB_PASSWORD') or os.getenv('POSTGRESQL_PASSWORD') or os.getenv('DATABASE_PASSWORD') or 'cxulDFiUcmTHqp34'
+        }
+
+DB_CONFIG = get_db_config()
 
 def get_db_connection():
     """Get database connection"""
