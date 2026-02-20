@@ -42,27 +42,3 @@ uvicorn main:app --reload
 
 FastAPI kommer mer automatisk swagger dokumentation, man kan testa endpoints när servern snurrar:
 http://127.0.0.1:8000/docs
-
-#### Exempel
-
-om man kör en GET på /cart/user_123 får man detta:
-
-```json
-{
-  "user_123": {
-    "user_id": "user_123",
-    "items": [
-      {
-        "product_id": 101,
-        "name": "Monstera",
-        "price": 30.0,
-        "quantity": 1,
-        "image_url": "https://example.com/monstera.jpg"
-      }
-    ],
-    "total_price": 30.0
-  }
-}
-```
-
-**OBS** datan är hårdkodad placeholder, men exempelvis kunde man kunna använda sig av detta format
