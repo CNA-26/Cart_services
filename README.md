@@ -33,10 +33,33 @@ pip install -r requirements.txt
 starta servern lokalt:
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 ---
+
+## Placeholder auth (API-key)
+
+Alla endpoints under `/cart/*` kräver en API-nyckel.
+
+- **Header**: `Authorization: ApiKey <key>`
+- **Miljövariabel**: `PLACEHOLDER_API_KEY`
+
+```
+
+---
+
+## JWT (spec)
+
+När placeholder auth ersätts av JWT ska cart-service använda:
+
+- **Header**: `Authorization: Bearer <jwt>`
+- **Alg**: `HS256` (via `JWT_SECRET`) eller senare `RS256` via JWKS (om auth-service tillhandahåller det)
+- **Required claims**: `sub`, `exp` (och vid behov `iss`, `aud`)
+
+Regel:
+
+- För kundanrop ska `user_id` i path matcha token-claim `sub` (annars `403`).
 
 ### Api dokumentation
 

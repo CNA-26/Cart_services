@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import os
 from . import database
 
 app = FastAPI()
@@ -37,12 +38,31 @@ class AddItemRequest(BaseModel):
 async def startup_event():
     database.init_database()
 
+
+def require_api_key(authorization: str | None = Header(default=None)):
+    expected_api_key = os.getenv("PLACEHOLDER_API_KEY")
+    if not expected_api_key:
+        raise HTTPException(status_code=500, detail="PLACEHOLDER_API_KEY is not configured")
+
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Missing Authorization header")
+
+    prefix = "ApiKey "
+    if not authorization.startswith(prefix):
+        raise HTTPException(status_code=401, detail="Invalid Authorization scheme")
+
+    provided_key = authorization[len(prefix):].strip()
+    if provided_key != expected_api_key:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+
+    return True
+
 @app.get("/")
 def read_root():
     return {"status": "Cart Service is running", "docs": "/docs"}
 
 
-@app.get("/cart/{user_id}", response_model=Cart)
+@app.get("/cart/{user_id}", response_model=Cart, dependencies=[Depends(require_api_key)])
 def get_cart_endpoint(user_id: str):
     cart = database.get_cart(user_id)
     if cart is None:
@@ -50,7 +70,7 @@ def get_cart_endpoint(user_id: str):
     return cart
 
 
-@app.post("/cart/{user_id}/add-item")
+@app.post("/cart/{user_id}/add-item", dependencies=[Depends(require_api_key)])
 def add_item_to_cart_endpoint(user_id: str, item: AddItemRequest):
     cart = database.add_item_to_cart(user_id, item.dict())
     if cart is None:
@@ -58,7 +78,7 @@ def add_item_to_cart_endpoint(user_id: str, item: AddItemRequest):
     return cart
 
 
-@app.delete("/cart/{user_id}/item/{product_id}")
+@app.delete("/cart/{user_id}/item/{product_id}", dependencies=[Depends(require_api_key)])
 def remove_item_from_cart_endpoint(user_id: str, product_id: int):
     result = database.remove_item_from_cart(user_id, product_id)
     if result is None:
