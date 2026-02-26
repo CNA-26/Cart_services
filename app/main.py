@@ -58,7 +58,15 @@ def get_current_user(authorization: str | None = Header(default=None)) -> str:
         
     try:
         # Decodes JWT using HS256 algorithm with JWT_SECRET
-        payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+        payload = jwt.decode(
+            token, 
+            jwt_secret, 
+            algorithms=["HS256"],
+            options={
+                "verify_aud": False,  # Ignorerar audience
+                "verify_iss": False   # Ignorerar issuer
+            }
+        )
         
         # Extract user_id from 'sub' claim
         user_id: str = payload.get("sub")
