@@ -1,11 +1,11 @@
 # Cart Service 🛒
 
-Detta är en Microservice som hanterar varukorgen för butiken
-Just nu körs den med mock data för att möjliggöra frontend-utveckling utan databas.
+Detta är en Microservice som hanterar varukorgen för butiken.
+Tjänsten använder PostgreSQL-databas och JWT-autentisering.
 
-API URL: https://cart-services-git-cartservices.2.rahtiapp.fi
+**API URL:** https://cart-services-git-cartservices.2.rahtiapp.fi
 
-**Endpoints:**
+## Endpoints:
 
 - **GET** `/cart/{user_id}` - Hämta cart
 - **POST** `/cart/{user_id}/add-item` - Lägg till item
@@ -13,7 +13,28 @@ API URL: https://cart-services-git-cartservices.2.rahtiapp.fi
 
 ---
 
-## Kom igång
+## Autentisering
+
+Alla endpoints under `/cart/*` kräver en giltig JWT token i Authorization headern
+
+---
+
+- **Header**: `Authorization: Bearer <jwt-token>`
+- **Alg**: `HS256`
+- **Required claims**: `sub` (user_id), `exp` (utgångstid)
+
+---
+
+### Api dokumentation
+
+FastAPI kommer mer automatisk swagger dokumentation, man kan testa endpoints när servern snurrar:
+https://cart-services-git-cartservices.2.rahtiapp.fi/docs
+eller lokalt:
+http://127.0.0.1:8000/docs
+
+---
+
+## Kom igång lokalt
 
 Skapa och aktivera virtuell miljö:
 
@@ -35,33 +56,3 @@ starta servern lokalt:
 ```bash
 uvicorn app.main:app --reload
 ```
-
----
-
-## Placeholder auth (API-key)
-
-Alla endpoints under `/cart/*` kräver en API-nyckel.
-
-- **Header**: `Authorization: ApiKey <key>`
-- **Miljövariabel**: `PLACEHOLDER_API_KEY`
-
-```
-
----
-
-## JWT (spec)
-
-När placeholder auth ersätts av JWT ska cart-service använda:
-
-- **Header**: `Authorization: Bearer <jwt>`
-- **Alg**: `HS256` (via `JWT_SECRET`) eller senare `RS256` via JWKS (om auth-service tillhandahåller det)
-- **Required claims**: `sub`, `exp` (och vid behov `iss`, `aud`)
-
-Regel:
-
-- För kundanrop ska `user_id` i path matcha token-claim `sub` (annars `403`).
-
-### Api dokumentation
-
-FastAPI kommer mer automatisk swagger dokumentation, man kan testa endpoints när servern snurrar:
-http://127.0.0.1:8000/docs
