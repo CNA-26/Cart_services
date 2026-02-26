@@ -22,6 +22,8 @@ Alla endpoints under `/cart/*` kräver en giltig JWT token i Authorization heade
 - **Header**: `Authorization: Bearer <jwt-token>`
 - **Alg**: `HS256`
 - **Required claims**: `sub` (user_id), `exp` (utgångstid)
+- **Optional claims**: `aud`, `iss`, dessa valideras **ej**
+- `email`, `role`, `iat`
 
 ---
 
