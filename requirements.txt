@@ -2,3 +2,5 @@ fastapi[standard]
 pydantic
 psycopg2-binary
 python-dotenv
+uvicorn[standard]
+python-jose[cryptography] #jwt
